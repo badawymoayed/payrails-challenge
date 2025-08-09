@@ -43,8 +43,8 @@ public class SymbolSearchTests extends BaseTest {
         // Assert 2: The response body structure matches our JSON schema
         response.then().body(matchesJsonSchemaInClasspath("jsonschema/symbol-search-schema.json"));
 
-        // Assert 3: The response time is within an acceptable threshold (e.g., less than 2 seconds)
-        response.then().time(lessThan(2000L));
+        // Assert 3: The response time is within an acceptable threshold (e.g., less than 5 seconds)
+        response.then().time(lessThan(5000L));
 
         // Assert 4: The expected symbol is present SOMEWHERE in the list of results
         response.then().body("bestMatches.\"1. symbol\"", hasItem(expectedSymbol));

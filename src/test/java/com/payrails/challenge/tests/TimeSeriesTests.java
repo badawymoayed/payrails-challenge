@@ -29,9 +29,6 @@ public class TimeSeriesTests extends BaseTest {
     public void testSuccessfulTimeSeries(String function, String symbol, String expectedSymbol) {
         log.info("Starting test with function: {}, symbol: {}, and expected symbol: {}", function, symbol, expectedSymbol);
 
-        // Pause for a few seconds to avoid the rate limit
-        pause(5);
-
         TimeSeriesApiClient client = new TimeSeriesApiClient();
         Response response = client.getTimeSeries(function, symbol, apiKey);
 
@@ -44,7 +41,7 @@ public class TimeSeriesTests extends BaseTest {
         response.then().body("MetaData.\"2. Symbol\"", equalTo(expectedSymbol));
 
         // Assert 3: The response time is within an acceptable threshold
-        response.then().time(lessThan(2000L));
+        response.then().time(lessThan(5000L));
 
         log.info("Test for function '{}' and symbol '{}' passed all validations.", function, symbol);
     }

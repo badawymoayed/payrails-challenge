@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Payrails API Automation Suite">
+    <test name="API Tests with Rate Limit Handling">
+        <classes>
+            <class name="com.payrails.challenge.tests.SymbolSearchTests" />
+            <class name="com.payrails.challenge.tests.TimeSeriesTests" />
+        </classes>
+    </test>
+</suite>
