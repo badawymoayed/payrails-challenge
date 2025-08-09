@@ -1,36 +1,39 @@
-# This is the name of our workflow, which will appear in GitHub's "Actions" tab
 name: API Test Automation
 
-# This tells GitHub when to run this workflow.
-on: [push]
+on:
+  push:
+    branches: [ main ]
 
-# A workflow is made up of one or more jobs.
 jobs:
-  build_and_test:
+  run_symbol_tests:
     runs-on: ubuntu-latest
-
-    # The 'env' section defines environment variables for the job.
     env:
       ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
-
-      # We can't use the 'pause' method from our BaseTest here.
-      # Instead, we will add a separate job to run the tests one by one.
       - name: Run Symbol Search Tests
-        run: mvn clean test -Dtest=SymbolSearchTests
+        run: mvn test -Dtest=SymbolSearchTests
 
+  run_time_series_tests:
+    runs-on: ubuntu-latest
+    needs: run_symbol_tests
+    env:
+      ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
       - name: Wait for API Rate Limit Reset
-        run: sleep 60 # Wait for 60 seconds to reset the API's rate limit
-
+        run: sleep 15 # Wait for 15 seconds to ensure the rate limit has reset
       - name: Run Time Series Tests
         run: mvn test -Dtest=TimeSeriesTests
