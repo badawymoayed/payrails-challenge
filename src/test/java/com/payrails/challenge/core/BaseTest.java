@@ -1,8 +1,8 @@
 package com.payrails.challenge.core;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvException;
 import io.restassured.RestAssured;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,21 +16,22 @@ public class BaseTest {
 
     @BeforeSuite(alwaysRun = true)
     public void setup() {
-        Dotenv dotenv = Dotenv.load();
+        try {
+            // Try to load variables from the .env file (for local runs)
+            Dotenv dotenv = Dotenv.load();
+            apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
+            log.info("API Key loaded from .env file.");
+        } catch (DotenvException e) {
+            // If .env file is not found, get the key from the system environment (for CI runs)
+            apiKey = System.getenv("ALPHAVANTAGE_API_KEY");
+            log.info("API Key loaded from system environment variable.");
+        }
+
         RestAssured.baseURI = "https://www.alphavantage.co";
-        apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
 
         if (apiKey == null || apiKey.trim().isEmpty()) {
             throw new IllegalStateException("The environment variable 'ALPHAVANTAGE_API_KEY' is not set. Please configure it to run the tests.");
         }
-        log.info("API Key loaded and environment setup successful.");
-    }
-
-    // We add a pause at the end of the entire test suite to respect the API rate limit
-    @AfterSuite(alwaysRun = true)
-    public void teardown() {
-        log.info("Pausing for 15 seconds to respect AlphaVantage API rate limit.");
-        pause(15);
     }
 
     protected void pause(int seconds) {
