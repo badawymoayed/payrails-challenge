@@ -2,29 +2,21 @@
 name: API Test Automation
 
 # This tells GitHub when to run this workflow.
-# 'push' means it will run every time you push code to the repository.
 on: [push]
 
 # A workflow is made up of one or more jobs.
 jobs:
-  # This is the name of our job
   build_and_test:
-    # This specifies the environment where the job will run.
-    # 'ubuntu-latest' is a standard, pre-configured virtual machine hosted by GitHub.
     runs-on: ubuntu-latest
 
     # The 'env' section defines environment variables for the job.
-    # We are setting the API key from the secret we just created.
     env:
       ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
 
-    # The 'steps' section is a list of commands and actions to be executed.
     steps:
-      # Action 1: This is a reusable action that checks out a copy of your repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Action 2: This action sets up the correct Java environment for us
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
@@ -32,6 +24,13 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # Action 3: This action runs our Maven command.
-      - name: Run Maven Tests
-        run: mvn clean test
+      # We can't use the 'pause' method from our BaseTest here.
+      # Instead, we will add a separate job to run the tests one by one.
+      - name: Run Symbol Search Tests
+        run: mvn clean test -Dtest=SymbolSearchTests
+
+      - name: Wait for API Rate Limit Reset
+        run: sleep 60 # Wait for 60 seconds to reset the API's rate limit
+
+      - name: Run Time Series Tests
+        run: mvn test -Dtest=TimeSeriesTests
