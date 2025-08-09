@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "bestMatches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "1. symbol": { "type": "string" },
+          "2. name": { "type": "string" },
+          "3. type": { "type": "string" }
+        },
+        "required": ["1. symbol", "2. name", "3. type"]
+      }
+    }
+  }
+}
