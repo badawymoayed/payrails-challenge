@@ -1,9 +1,8 @@
-name: API Test Automation CI
+name: API Test Automation
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
   run_symbol_tests:
@@ -19,21 +18,21 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Run Symbol Search Tests
-        run: mvn clean test -Dgroups=regression
+        run: mvn clean test -Dtest=SymbolSearchTests
 
-      - name: Upload ExtentReports Report
+      - name: Upload Symbol ExtentReports Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ExtentReports-Report
-          path: target/ExtentReport.html
+          name: ExtentReports-Report-Symbol
+          path: target/surefire-reports/ExtentReport.html
 
-      - name: Upload Allure Results (Raw Data)
+      - name: Upload Symbol Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Allure-Results
-          path: allure-results
+          name: Allure-Results-Symbol
+          path: target/allure-results
 
   run_time_series_tests:
     runs-on: ubuntu-latest
@@ -51,21 +50,21 @@ jobs:
       - name: Wait for API Rate Limit Reset
         run: sleep 60 # Wait for 60 seconds to ensure the rate limit has reset
       - name: Run Time Series Tests
-        run: mvn test -Dgroups=smoke
+        run: mvn test -Dtest=TimeSeriesTests
 
-      - name: Upload ExtentReports Report
+      - name: Upload Time Series ExtentReports Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ExtentReports-Report
-          path: target/ExtentReport.html
+          name: ExtentReports-Report-TimeSeries
+          path: target/surefire-reports/ExtentReport.html
 
-      - name: Upload Allure Results (Raw Data)
+      - name: Upload Time Series Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Allure-Results
-          path: allure-results
+          name: Allure-Results-TimeSeries
+          path: target/allure-results
 
   allure_report:
     runs-on: ubuntu-latest
@@ -74,17 +73,17 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: Download Allure Results from Regression
+      - name: Download Allure Results
         uses: actions/download-artifact@v4
         with:
-          name: Allure-Results
-          path: allure-results
+          name: Allure-Results-Symbol
+          path: allure-results/symbol
 
-      - name: Download Allure Results from Smoke
+      - name: Download Time Series Allure Results
         uses: actions/download-artifact@v4
         with:
-          name: Allure-Results
-          path: allure-results
+          name: Allure-Results-TimeSeries
+          path: allure-results/time_series
 
       - name: Generate Allure Report
         run: mvn allure:report
