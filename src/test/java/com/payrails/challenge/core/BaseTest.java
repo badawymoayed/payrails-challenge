@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class BaseTest {
 
     private static final Logger log = LoggerFactory.getLogger(BaseTest.class);
-    protected String apiKey;
+    protected static String apiKey;
 
     @BeforeSuite(alwaysRun = true)
     public void setup() {
