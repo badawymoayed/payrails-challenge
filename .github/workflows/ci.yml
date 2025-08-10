@@ -17,11 +17,12 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
-      - name: Run Symbol Search Tests
-        run: mvn test -Dtest=SymbolSearchTests
+      - name: Run Tests
+        run: mvn clean test
 
-      - name: Wait to Avoid API Rate Limit
-        run: sleep 60
-
-      - name: Run Time Series Tests
-        run: mvn test -Dtest=TimeSeriesTests
+      # This is the step that uploads the ExtentReports report as a downloadable artifact.
+      - name: Upload ExtentReports Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ExtentReports-Report
+          path: target/surefire-reports/ExtentReport.html

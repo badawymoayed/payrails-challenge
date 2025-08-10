@@ -1,5 +1,9 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Payrails API Automation Suite">
+    <listeners>
+        <listener class-name="com.payrails.challenge.core.ExtentTestListener" />
+        <listener class-name="com.aventstack.extentreports.testng.listener.ExtentITestListenerClassAdapter" />
+    </listeners>
     <test name="API Tests with Rate Limit Handling">
         <classes>
             <class name="com.payrails.challenge.tests.SymbolSearchTests" />
