@@ -18,25 +18,17 @@ public class TimeSeriesTests extends BaseTest {
 
     private static final Logger log = LoggerFactory.getLogger(TimeSeriesTests.class);
 
-    /**
-     * Provides test data for various time series functions and symbols.
-     * @return A 2D object array with function name, symbol, and expected symbol.
-     */
     @DataProvider(name = "timeSeriesData")
     public Object[][] timeSeriesData() {
         return new Object[][] {
-                {"TIME_SERIES_DAILY", "IBM", "IBM"},
-                {"TIME_SERIES_WEEKLY", "MSFT", "MSFT"},
-                {"TIME_SERIES_MONTHLY", "TSLA", "TSLA"}
+                {"TIME_SERIES_DAILY", "IBM", "IBM", "jsonschema/timeseries-daily-schema.json"},
+                {"TIME_SERIES_WEEKLY", "MSFT", "MSFT", "jsonschema/timeseries-weekly-schema.json"},
+                {"TIME_SERIES_MONTHLY", "TSLA", "TSLA", "jsonschema/timeseries-monthly-schema.json"}
         };
     }
 
-    /**
-     * TC-04: Verifies successful data retrieval for various time series.
-     * This data-driven test validates status code, schema, response time, and metadata.
-     */
     @Test(dataProvider = "timeSeriesData", description = "TC-04: Verifies successful data retrieval")
-    public void testSuccessfulTimeSeries(String function, String symbol, String expectedSymbol) {
+    public void testSuccessfulTimeSeries(String function, String symbol, String expectedSymbol, String schemaPath) {
         log.info("Starting test with function: {}, symbol: {}, and expected symbol: {}", function, symbol, expectedSymbol);
 
         TimeSeriesApiClient client = new TimeSeriesApiClient();
@@ -45,20 +37,13 @@ public class TimeSeriesTests extends BaseTest {
         log.debug("API Response Body for function '{}' and symbol '{}':\n{}", function, symbol, response.asPrettyString());
 
         response.then()
-                // Assert 1: The status code is 200 OK
                 .statusCode(200)
-
-                // Assert 2: The response body structure matches our JSON schema
-                // NOTE: This schema is for DAILY. Weekly/Monthly would need their own schemas.
-                .body(matchesJsonSchemaInClasspath("jsonschema/timeseries-daily-schema.json"))
-
-                // Assert 3: The response time is within an acceptable threshold
                 .time(lessThan(5000L))
-
-                // Assert 4: The response body contains the correct symbol in the metadata
-                .body("'Meta Data'.'2. Symbol'", equalTo(expectedSymbol));
+                .body("'Meta Data'.'2. Symbol'", equalTo(expectedSymbol))
+                // DYNAMIC SCHEMA VALIDATION: Uses the schema path from the DataProvider
+                .body(matchesJsonSchemaInClasspath(schemaPath));
 
         log.info("Test for function '{}' and symbol '{}' passed all validations.", function, symbol);
-        pause(2);
+        pause(15); // Adding a 15-second pause after each call to respect the API limit
     }
 }
