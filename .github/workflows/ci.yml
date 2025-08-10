@@ -1,8 +1,9 @@
-name: API Test Automation
+name: API Test Automation CI
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   run_symbol_tests:
@@ -11,36 +12,28 @@ jobs:
       ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
-
       - name: Run Symbol Search Tests
         run: mvn clean test -Dtest=SymbolSearchTests
-
-      - name: Verify ExtentReport Exists
-        run: ls -la target/surefire-reports/ExtentReport.html
 
       - name: Upload Symbol ExtentReports Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReports-Report-Symbol
-          path: target/ExtentReport.html
-
-      - name: Verify Allure Results Exist
-        run: ls -la target/allure-results
+          path: target/surefire-reports/ExtentReport.html
 
       - name: Upload Symbol Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Allure-Results-Symbol
-          path: target/allure-results
+          path: allure-results
 
   run_time_series_tests:
     runs-on: ubuntu-latest
@@ -49,32 +42,23 @@ jobs:
       ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
-
       - name: Wait for API Rate Limit Reset
-        run: sleep 60
-
+        run: sleep 60 # Wait for 60 seconds to ensure the rate limit has reset
       - name: Run Time Series Tests
         run: mvn test -Dtest=TimeSeriesTests
-
-      - name: Verify ExtentReport Exists
-        run: ls -la target/ExtentReport.html
 
       - name: Upload Time Series ExtentReports Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReports-Report-TimeSeries
-          path: target/ExtentReport.html
-
-      - name: Verify Allure Results Exist
-        run: ls -la target/allure-results
+          path: target/surefire-reports/ExtentReport.html
 
       - name: Upload Time Series Allure Results
         if: always()
@@ -90,7 +74,7 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: Download Symbol Allure Results
+      - name: Download Allure Results
         uses: actions/download-artifact@v4
         with:
           name: Allure-Results-Symbol
@@ -102,12 +86,6 @@ jobs:
           name: Allure-Results-TimeSeries
           path: allure-results/time_series
 
-      - name: Merge Allure Results
-        run: |
-          mkdir -p target/allure-results
-          cp -r allure-results/symbol/* target/allure-results/
-          cp -r allure-results/time_series/* target/allure-results/
-
       - name: Generate Allure Report
         run: mvn allure:report
 
@@ -115,4 +93,4 @@ jobs:
         uses: actions/deploy-pages@v1
         with:
           name: Allure-Report
-          path: target/site/allure-maven-plugin
+          path: target/allure-report
