@@ -21,12 +21,14 @@ jobs:
           cache: 'maven'
       - name: Run Full Regression Suite
         run: mvn clean test -Dgroups=regression
+
       - name: Upload ExtentReports Report (Regression)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReports-Report-Regression
           path: target/ExtentReport.html
+
       - name: Upload Allure Results (Raw Data)
         if: always()
         uses: actions/upload-artifact@v4
@@ -56,12 +58,12 @@ jobs:
           name: ExtentReports-Report-Smoke
           path: target/ExtentReport.html
 
-  allure_report:
+  generate_and_deploy_report:
     runs-on: ubuntu-latest
     needs: build_and_test_regression
     permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
+      pages: write
+      id-token: write
     steps:
       - name: Download Allure Results
         uses: actions/download-artifact@v4
