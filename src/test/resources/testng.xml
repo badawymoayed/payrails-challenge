@@ -3,6 +3,7 @@
     <listeners>
         <listener class-name="com.payrails.challenge.core.ExtentTestListener" />
         <listener class-name="com.aventstack.extentreports.testng.listener.ExtentITestListenerClassAdapter" />
+        <listener class-name="io.qameta.allure.testng.AllureTestNg" />
     </listeners>
     <test name="API Tests with Rate Limit Handling">
         <classes>
