@@ -38,7 +38,7 @@ public class SymbolSearchTests extends BaseTest {
      * This is a data-driven test that uses the 'symbolSearchData' provider.
      * It validates status code, response time, JSON schema, and the presence of the expected symbol.
      */
-    @Test(dataProvider = "symbolSearchData", description = "TC-01: Verifies a successful search for a known symbol")
+    @Test(dataProvider = "symbolSearchData", description = "TC-01: Verifies a successful search for a known symbol", groups = {"regression"})
     public void testSuccessfulSymbolSearch(String keyword, String expectedSymbol) {
         log.info("Starting test with keyword: {} and expected symbol: {}", keyword, expectedSymbol);
 
@@ -68,7 +68,7 @@ public class SymbolSearchTests extends BaseTest {
      * TC-02: Verifies that a search for a keyword with no matches returns a 200 OK status
      * and an empty list of results, as per the API contract.
      */
-    @Test(description = "TC-02: Verifies a search for a keyword with no matches returns an empty list")
+    @Test(description = "TC-02: Verifies a search for a keyword with no matches returns an empty list",groups = {"smoke"})
     public void testSearchWithNoResults() {
         log.info("Starting test for a search with no expected results.");
 

@@ -27,7 +27,7 @@ public class TimeSeriesTests extends BaseTest {
         };
     }
 
-    @Test(dataProvider = "timeSeriesData", description = "TC-04: Verifies successful data retrieval")
+    @Test(dataProvider = "timeSeriesData", description = "TC-04: Verifies successful data retrieval", groups = {"regression","smoke"})
     public void testSuccessfulTimeSeries(String function, String symbol, String expectedSymbol, String schemaPath) {
         log.info("Starting test with function: {}, symbol: {}, and expected symbol: {}", function, symbol, expectedSymbol);
 
