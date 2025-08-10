@@ -1,29 +1,28 @@
-# .github/workflows/ci.yml
+# This is the final, complete GitHub Actions workflow file.
 
 name: API Test Automation CI
 
-# This workflow runs on any push to the 'main' branch
+# This workflow runs on any push to the 'main' branch and can also be run manually.
 on:
   push:
     branches: [ main ]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  # This single job will build, test, and prepare reports
+  # This job builds the project, runs the tests, and uploads the results as artifacts.
   build_and_test:
     runs-on: ubuntu-latest
-    
-    # Securely use the API key from GitHub Secrets
+
+    # Securely uses the API key from GitHub Secrets.
     env:
       ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
 
     steps:
-      # Step 1: Check out the repository code
+      # Step 1: Check out the repository code.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up the Java and Maven environment
+      # Step 2: Set up the Java and Maven environment with caching for speed.
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
@@ -31,62 +30,61 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # Step 3: Run the tests using the testng.xml suite
+      # Step 3: Run the full test suite using the testng.xml file.
       - name: Run Maven Tests
         run: mvn clean test
 
-      # Step 4: Upload the ExtentReports HTML file as an artifact
+      # Step 4: Upload the ExtentReports HTML file as a downloadable artifact.
       - name: Upload ExtentReports Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReports-Report
-          path: target/ExtentReport.html
+          path: target/test-output/ExtentReport.html
 
-      # Step 5: Upload the Allure results directory as an artifact
-      # CRITICAL FIX: The path is updated to look inside the 'target' directory.
+      # Step 5: Upload the Allure results directory as a downloadable artifact.
       - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Allure-Results
-          path: allure-results
+          path: target/allure-results # Corrected path to look inside the target directory.
           retention-days: 5
 
-  # This second job depends on the first one and will only run after it's complete.
-  # Its purpose is to generate the Allure Report and deploy it.
+  # This second job generates and deploys the Allure report to a live website.
   generate_allure_report:
     runs-on: ubuntu-latest
+    # This job will only run after the 'build_and_test' job has completed.
     needs: build_and_test
 
-    # This grants permissions for the actions to deploy to GitHub Pages
+    # These permissions are required for the action to deploy to GitHub Pages.
     permissions:
       contents: read
       pages: write
       id-token: write
 
     steps:
-      # Step 1: Download the Allure results that the previous job uploaded
+      # Step 1: Download the Allure results artifact that the previous job uploaded.
       - name: Download Allure Results
         uses: actions/download-artifact@v4
         with:
           name: Allure-Results
           path: allure-results
 
-      # Step 2: Generate the Allure Report using a more modern action
+      # Step 2: Generate the Allure Report using a stable, modern action.
       - name: Generate Allure Report
-        uses: allure-framework/allure-github-action@v1.6.1
+        uses: allure-framework/allure-github-action@v1.9.0
         with:
           results_path: allure-results
           report_path: allure-report
 
-      # Step 3: Upload the generated report as an artifact to be deployed
+      # Step 3: Upload the generated HTML report as a Pages artifact.
       - name: Upload Allure Report for Deployment
         uses: actions/upload-pages-artifact@v3
         with:
           path: allure-report
 
-      # Step 4: Deploy the Allure Report to GitHub Pages
+      # Step 4: Deploy the artifact to a live GitHub Pages website.
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
