@@ -1,4 +1,3 @@
-# This is the name of our workflow, which will appear in GitHub's "Actions" tab
 name: API Test Automation
 
 on:
@@ -22,7 +21,7 @@ jobs:
         run: mvn test -Dtest=SymbolSearchTests
 
       - name: Wait to Avoid API Rate Limit
-        run: sleep 60 # Wait for 60 seconds to reset the API's rate limit
+        run: sleep 60
 
       - name: Run Time Series Tests
         run: mvn test -Dtest=TimeSeriesTests

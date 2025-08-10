@@ -17,12 +17,10 @@ public class BaseTest {
     @BeforeSuite(alwaysRun = true)
     public void setup() {
         try {
-            // Try to load variables from the .env file (for local runs)
             Dotenv dotenv = Dotenv.load();
             apiKey = dotenv.get("ALPHAVANTAGE_API_KEY");
             log.info("API Key loaded from .env file.");
         } catch (DotenvException e) {
-            // If .env file is not found, get the key from the system environment (for CI runs)
             apiKey = System.getenv("ALPHAVANTAGE_API_KEY");
             log.info("API Key loaded from system environment variable.");
         }
