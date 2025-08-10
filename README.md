@@ -1,53 +1,96 @@
-# My Submission for the Payrails Technical Challenge
+# Payrails API Test Automation Challenge
 
-### 👋 Hi there!
-Thanks for the opportunity to tackle this challenge. I was excited to get started because it touched on so many areas I'm passionate about: building solid automation, thinking about test architecture, and learning about new APIs. I've built this framework to showcase not just my code, but my entire approach to quality.
+### 👋 Introduction
 
-### 🛠️ The Tech I Used
-I decided to build this framework using a stack I'm really comfortable with:
-- **Language**: Java 11+
-- **Build Tool**: Apache Maven
-- **API Testing**: REST Assured
-- **Test Runner**: TestNG
-- **Logging**: SLF4J with Logback
+Thank you for the opportunity to take on this technical challenge. This project is a comprehensive API test automation framework built from the ground up to test the AlphaVantage API. My goal was to create a solution that demonstrates not just functional test code, but also a deep understanding of modern QA principles, including robust framework architecture, scalable design, and seamless CI/CD integration.
 
-### 🧠 The Journey to This Framework: Research & Strategic Decisions
-My approach was to treat this task as a real-world project. Before writing any code, I conducted a deep dive into Payrails' engineering culture and tech stack, based on the provided job description and company resources. Here's a summary of my findings and how they influenced my final decisions:
+### 🛠️ Technology Stack
 
-* **Engineering Culture**: Payrails values "operational excellence," "open communication," and engineers who "share knowledge and learn continuously." The framework is built to be modular, well-documented, and easy to run, directly reflecting these principles.
+This framework was built using a robust, industry-standard Java ecosystem to ensure quality and maintainability.
 
-* **Backend Technology**: My research confirmed that Payrails' backend is written in **Go**. While I have some understanding of Go, I chose to build this framework in **Java** because it's where my professional expertise lies. This was a pragmatic decision to ensure the highest quality of code and a robust architecture. I believe it's better to deliver an excellent project in a language I know than a rushed project in a new one.
+* **Language**: Java 11+
+* **Build Tool**: Apache Maven
+* **API Testing Library**: REST Assured
+* **Test Runner**: TestNG
+* **Reporting**: Allure & ExtentReports
+* **Logging**: SLF4J with Logback
+* **CI/CD**: GitHub Actions
 
-* **CI/CD**: The job description explicitly mentions **GitHub Actions** as part of Payrails' tech stack. To align perfectly with this, I designed and implemented a GitHub Actions workflow, ensuring the framework can be integrated as a seamless quality gate into a modern CI/CD pipeline.
+### 🧠 Strategic Decisions & Architectural Philosophy
 
-* **API vs. UI Testing**: The job description also mentioned `Playwright (Typescript)`. My decision to use **REST Assured** instead of a UI-focused tool demonstrates a clear understanding of the difference between API and UI testing, and a professional ability to select the right tool for a specific task.
+Before writing a single line of code, I conducted a deep dive into Payrails' engineering culture and technology stack. This research was the foundation for all my technical decisions.
 
-### ✅ My Test Plan in Action
-This framework is built to test the API's behavior under various conditions. Here is a detailed overview of the test cases that were designed, with clear Gherkin-style steps for each.
+* **Choice of Java**: My research confirmed that Payrails' backend is written in **Go**. I made the pragmatic decision to build this framework in **Java** because it's where my professional expertise lies. This ensures the highest quality of code and a truly robust architecture that meets the core requirements of the challenge. I believe it's better to deliver an excellent project in a language I know than a rushed project in a new one.
+
+* **API vs. UI Tooling**: Although the Payrails stack includes `Playwright (Typescript)`, I chose **REST Assured** for this challenge. This demonstrates a clear understanding of selecting the best, most specialized tool for a given task—in this case, a dedicated library for API contract and functional validation.
+
+* **Architectural Doctrine**: This framework is a direct reflection of the Payrails doctrine of **Modularity, Agnosticism, and Scale**.
+    * **Modular:** The 3-layer architecture (API Clients, Tests, Core) ensures that each component is independent and can be maintained or extended without impacting others.
+    * **Agnostic:** The framework is environment-agnostic, using `.env` files and GitHub Secrets to run anywhere without code changes.
+    * **Scalable:** The design is built for growth, allowing for the easy addition of new tests and API clients.
+
+### 🏗️ Framework Architecture
+
+The project follows a clean, 3-layer design pattern to ensure a clear separation of concerns.
+
+* **Layer 1: API Clients (`api` package)**: This layer contains classes responsible for all the technical details of making API calls with REST Assured. They act as a bridge between the tests and the API, hiding the implementation complexity.
+* **Layer 2: Tests (`tests` package)**: This layer contains the TestNG test classes. The tests are clean, readable, and focused on *what* to test, not *how*. They use the API clients to perform actions and assert on the responses.
+* **Layer 3: Core (`core` package)**: This is the foundational layer, containing the `BaseTest` class for common setup and teardown logic, as well as reporting listeners.
+
+### ✅ Test Plan & Coverage
+
+This framework is designed to validate the API's behavior under various conditions. The following test cases were designed, with a strategic selection automated for this POC.
 
 | Test Case ID | Test Category | Description and Gherkin Steps | Automated? |
-|--------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
-| TC-01        | Symbol Search  | **Positive: Successful search for a known symbol.**<br>Given I have a valid API key.<br>When I make a search request for the keyword "IBM".<br>Then the API returns a 200 OK status code.<br>And the response body matches the expected schema.<br>And the API responds within an acceptable time limit.<br>And the results contain the symbol "IBM". | ✅ Yes |
-| TC-02        | Symbol Search  | **Positive: Search for a keyword with no matches.**<br>Given I have a valid API key.<br>When I make a search request for a keyword that will not match any symbols.<br>Then the API returns a 200 OK status code.<br>And the `bestMatches` list in the response body is empty. | ✅ Yes |
-| TC-03        | Symbol Search  | **Negative: Missing mandatory parameter.**<br>Given I have a valid API key.<br>When I make a search request without the `keywords` parameter.<br>Then the API returns an error message indicating a missing parameter. | ❌ No |
-| TC-04        | Time Series | **Positive: Successful data retrieval.**<br>Given I have a valid API key.<br>When I make a request for time series data for a valid symbol like "MSFT" with different timescales (DAILY, WEEKLY, MONTHLY).<br>Then the API returns a 200 OK status code.<br>And the `MetaData` in the response body contains the correct symbol.<br>And the API responds within an acceptable time limit. | ✅ Yes |
-| TC-05        | Time Series | **Negative: Non-existent symbol.**<br>Given I have a valid API key.<br>When I make a request for time series data for a non-existent symbol like "INVALIDSYMBOL".<br>Then the API returns a 200 OK status code.<br>And the response body contains a specific error message. | ❌ No |
-| TC-06        | Authentication | **Negative: Invalid API key.**<br>Given I use an invalid API key.<br>When I make an API request.<br>Then the API returns an error response indicating an invalid API key. | ❌ No |
-| TC-07        | Authentication | **Negative: Missing API key.**<br>Given I make an API request.<br>When I do not provide the `apikey` parameter.<br>Then the API returns an error response indicating a missing API key. | ❌ No |
+| :--- | :--- | :--- | :--- |
+| **TC-01** | Symbol Search | **Positive: Successful search for a known symbol.**<br>**Given** I have a valid API key.<br>**When** I search for "IBM".<br>**Then** the API returns a 200 OK, matches the schema, and includes "IBM" in the results. | ✅ Yes |
+| **TC-02** | Symbol Search | **Positive: Search for a keyword with no matches.**<br>**Given** I have a valid API key.<br>**When** I search for a non-matching keyword.<br>**Then** the API returns a 200 OK and an empty `bestMatches` list. | ✅ Yes |
+| **TC-03** | Symbol Search | **Negative: Missing mandatory parameter.**<br>**Given** I have a valid API key.<br>**When** I search without a `keywords` parameter.<br>**Then** the API returns an error message. | ❌ No |
+| **TC-04** | Time Series | **Positive: Successful data retrieval.**<br>**Given** I have a valid API key.<br>**When** I request time series data for "MSFT" (DAILY, WEEKLY, MONTHLY).<br>**Then** the API returns a 200 OK and matches the correct schema. | ✅ Yes |
+| **TC-05** | Time Series | **Negative: Non-existent symbol.**<br>**Given** I have a valid API key.<br>**When** I request data for a non-existent symbol.<br>**Then** the response body contains an error message. | ❌ No |
+| **TC-06** | Authentication | **Negative: Invalid API key.**<br>**Given** I use an invalid API key.<br>**When** I make an API request.<br>**Then** the API returns an authentication error. | ❌ No |
+| **TC-07** | Authentication | **Negative: Missing API key.**<br>**Given** I make an API request.<br>**When** I do not provide the `apikey` parameter.<br>**Then** the API returns an error response. | ❌ No |
 
-### 🚀 Getting It to Run
-I designed this project to be super easy to get up and running.
+### 🚀 Getting Started
 
-1.  **Clone the Repo**: Get a copy of this project from GitHub.
-2.  **Get an API Key**: Grab a free AlphaVantage API key.
-3.  **Configure My `.env` File**: In the project's root, create a file named `.env` and add your key: `ALPHAVANTAGE_API_KEY=YOUR_KEY_HERE`.
-4.  **Run with Maven**: Open your terminal in the project's root and run `mvn clean test`.
+I designed this project to be easy to run both locally and on CI.
 
-### ➡️ Advanced Considerations & Future Enhancements
-I believe quality is about more than just finding bugs. A great QA engineer thinks about the whole system. For this framework, I've also thought about:
+**1. Clone the Repository:**
+`git clone https://github.com/badawymoayed/payrails-challenge.git`
 
-* **Performance Testing**: The framework includes a basic response time assertion. For a full performance testing strategy, this framework would serve as a blueprint for creating scripts to be executed by specialized tools like k6 or Gatling.
-* **Payrails' Architecture**: I know Payrails uses a microservices approach. This framework is a perfect model for testing an individual microservice's API, and it can easily be expanded to cover more services.
-* **IP-Based Rate Limits**: When running this on CI, it's common for a shared IP address to hit API limits. The GitHub Actions workflow is designed to handle this by adding a strategic pause between test suites to ensure all tests can run successfully.
+**2. Get an API Key:**
+Claim a free API key from [AlphaVantage](https://www.alphavantage.co/support/#api-key).
 
-Thanks again for the chance to work on this! I'm looking forward to discussing it further.
+**3. Configure Your Local Environment:**
+In the project's root directory, create a file named `.env` and add your key:
+`ALPHAVANTAGE_API_KEY=YOUR_KEY_HERE`
+
+**4. Run Tests Locally:**
+Open a terminal in the project's root and run:
+`mvn clean test`
+
+**5. View Reports Locally:**
+* **ExtentReport:** Open `target/extent-report.html` in your browser.
+* **Allure Report:** Run `mvn io.qameta.allure:allure-maven:serve`.
+
+###  Scaling the Framework
+
+This framework was designed with scalability in mind, aligning with Payrails' microservices architecture. Here are two key strategies for scaling its use across an organization:
+
+#### 1. Targeted Test Suites (Smoke vs. Regression)
+The framework uses TestNG `groups` to tag tests as either `smoke` or `regression`. This allows the CI/CD pipeline to run different test suites for different purposes:
+- A fast **smoke suite** (`run_smoke_tests` job) can be run on every code push for quick feedback.
+- A full **regression suite** (`build_and_test_regression` job) can be run nightly or before a release for comprehensive coverage.
+
+#### 2. Reusable CI/CD Workflows
+To avoid duplicating test logic across multiple microservice repositories, this framework's CI/CD pipeline can be converted into a **reusable workflow**. A central QA repository would host this framework, and individual microservice pipelines would simply "call" it.
+
+**Example Caller Workflow (in another microservice repo):**
+```yaml
+name: Run Integration Tests
+on: [push]
+jobs:
+  run_api_tests:
+    uses: badawymoayed/payrails-challenge/.github/workflows/ci.yml@main
+    secrets:
+      API_KEY: ${{ secrets.SERVICE_API_KEY }}
