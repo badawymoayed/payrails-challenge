@@ -97,12 +97,9 @@
                     </argLine>
                     <testFailureIgnore>false</testFailureIgnore>
 
-                    <properties>
-                        <property>
-                            <name>allure.results.directory</name>
-                            <value>${project.build.directory}/allure-results</value>
-                        </property>
-                    </properties>
+                    <systemPropertyVariables>
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                    </systemPropertyVariables>
 
                 </configuration>
                 <dependencies>
