@@ -6,69 +6,84 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_test_regression:
+  run_symbol_tests:
     runs-on: ubuntu-latest
     env:
       ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
-      - name: Run Full Regression Suite
+      - name: Run Symbol Search Tests
         run: mvn clean test -Dgroups=regression
 
-      - name: Upload ExtentReports Report (Regression)
+      - name: Upload ExtentReports Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ExtentReports-Report-Regression
+          name: ExtentReports-Report
           path: target/ExtentReport.html
 
       - name: Upload Allure Results (Raw Data)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Allure-Results-Regression
+          name: Allure-Results
           path: allure-results
 
-  run_smoke_tests:
+  run_time_series_tests:
     runs-on: ubuntu-latest
+    needs: run_symbol_tests
     env:
       ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
-      - name: Run Smoke Test Suite
-        run: mvn clean test -Dgroups=smoke
-      - name: Upload ExtentReports Report (Smoke)
+      - name: Wait for API Rate Limit Reset
+        run: sleep 60 # Wait for 60 seconds to ensure the rate limit has reset
+      - name: Run Time Series Tests
+        run: mvn test -Dgroups=smoke
+
+      - name: Upload ExtentReports Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ExtentReports-Report-Smoke
+          name: ExtentReports-Report
           path: target/ExtentReport.html
 
-  generate_and_deploy_report:
+      - name: Upload Allure Results (Raw Data)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Allure-Results
+          path: allure-results
+
+  allure_report:
     runs-on: ubuntu-latest
-    needs: build_and_test_regression
+    needs: [run_symbol_tests, run_time_series_tests]
     permissions:
       pages: write
       id-token: write
     steps:
-      - name: Download Allure Results
+      - name: Download Allure Results from Regression
         uses: actions/download-artifact@v4
         with:
-          name: Allure-Results-Regression
+          name: Allure-Results
+          path: allure-results
+
+      - name: Download Allure Results from Smoke
+        uses: actions/download-artifact@v4
+        with:
+          name: Allure-Results
           path: allure-results
 
       - name: Generate Allure Report
