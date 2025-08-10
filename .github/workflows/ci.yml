@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReports-Report
-          path: target/test-output/ExtentReport.html
+          path: target/ExtentReport.html
 
       # Step 5: Upload the Allure results directory as a downloadable artifact.
       - name: Upload Allure Results
@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Allure-Results
-          path: target/allure-results # Corrected path to look inside the target directory.
+          path: allure-results # Corrected path to look inside the target directory.
           retention-days: 5
 
   # This second job generates and deploys the Allure report to a live website.
