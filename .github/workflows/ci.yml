@@ -40,8 +40,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReports-Report
-          # CORRECTED PATH: Matches the output from ExtentTestListener.java
-          path: target/extent-report.html
+          # FINAL CORRECTED PATH based on your confirmation
+          path: target/test-output/ExtentReport.html
 
       # Step 5: Upload the Allure results directory as a downloadable artifact.
       - name: Upload Allure Results
@@ -49,7 +49,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Allure-Results
-          # CORRECTED PATH: Matches the output from the final pom.xml configuration
           path: target/allure-results
           retention-days: 5
 
@@ -70,23 +69,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: Allure-Results
-          # This path is the local directory where the artifact will be downloaded to on the runner
           path: allure-results
 
       # Step 2: Generate the Allure Report using a stable, modern action.
       - name: Generate Allure Report
-        uses: allure-framework/allure-github-action@v1.9.0
+        uses: simple-elf/allure-report-action@v1.7
         with:
-          results_path: allure-results
-          report_path: allure-report
+          allure_results: allure-results
+          gh_pages: gh-pages
+          allure_report: allure-report
 
-      # Step 3: Upload the generated HTML report as a Pages artifact.
-      - name: Upload Allure Report for Deployment
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: allure-report
-
-      # Step 4: Deploy the artifact to a live GitHub Pages website.
+      # Step 3: Deploy the report to GitHub Pages.
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
