@@ -74,12 +74,12 @@ jobs:
           name: Allure-Results-Regression
           path: allure-results
 
-      # Step 2: Generate the HTML report from the raw data
-      - name: Generate Allure Report
-        uses: allure-framework/allure-action@v2.10.0 # Using a stable, recent version
-        with:
-          results_path: allure-results
-          report_path: allure-report
+#      # Step 2: Generate the HTML report from the raw data
+#      - name: Generate Allure Report
+#        uses: allure-framework/allure-action@v2.10.0 # Using a stable, recent version
+#        with:
+#          results_path: allure-results
+#          report_path: allure-report
 
       # Step 3: THIS IS THE KEY FIX - Upload the generated HTML report for deployment
       - name: Upload artifact for deployment
