@@ -20,9 +20,9 @@ jobs:
       - name: Run Tests
         run: mvn clean test
 
-      # This is the step that uploads the ExtentReports report as a downloadable artifact.
+      # This is the corrected step that uploads the ExtentReports report as a downloadable artifact.
       - name: Upload ExtentReports Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v5  # Corrected to use v4 or later
         with:
           name: ExtentReports-Report
           path: target/surefire-reports/ExtentReport.html
