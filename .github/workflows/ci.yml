@@ -69,6 +69,9 @@ jobs:
           name: Allure-Results-Regression
           path: target/allure-results
 
+      - name: Generate Allure Report
+        run: mvn allure:report
+
       - name: Download Allure Results from Smoke
         uses: actions/download-artifact@v4
         with:
