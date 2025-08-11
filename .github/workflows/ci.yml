@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Allure-Results-Regression
-          path: allure-results
+          path: target/allure-results
 
   run_smoke_tests:
     runs-on: ubuntu-latest
@@ -73,7 +73,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: Allure-Results-Smoke
-          path: /allure-results
+          path: target/allure-results
 
       - name: Generate Allure Report
         run: mvn allure:report
@@ -82,4 +82,4 @@ jobs:
         uses: actions/deploy-pages@v1
         with:
           name: Allure-Report
-          path: /allure-report
+          path: target/allure-report
