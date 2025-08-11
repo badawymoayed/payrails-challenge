@@ -73,7 +73,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: Allure-Results-Smoke
-          path: target/allure-results
+          path: /allure-results
 
       - name: Generate Allure Report
         run: mvn allure:report
@@ -82,4 +82,4 @@ jobs:
         uses: actions/deploy-pages@v1
         with:
           name: Allure-Report
-          path: target/allure-report
+          path: /allure-report
