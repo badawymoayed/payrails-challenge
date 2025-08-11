@@ -6,7 +6,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # This job runs the FULL regression suite and creates the report data
   build_and_test_regression:
     runs-on: ubuntu-latest
     env:
@@ -35,7 +34,6 @@ jobs:
           name: Allure-Results-Regression
           path: allure-results
 
-  # This job runs a quick smoke test in parallel
   run_smoke_tests:
     runs-on: ubuntu-latest
     env:
